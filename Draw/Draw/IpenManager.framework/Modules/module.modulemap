@@ -1,0 +1,6 @@
+framework module IpenManager {
+  umbrella header "IpenManager.h"
+
+  export *
+  module * { export * }
+}
