@@ -376,6 +376,7 @@
 }
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    NSLog(@"touchesBegan.........");
     if (isDraw1 == YES) {
         return;
     }
@@ -386,6 +387,7 @@
     
     
     if (_isConnectBluetooth && self.toucheID == 1) {
+        NSLog(@"is connetcttt.t.... blue tooth");
         BOOL isHaveTouch = NO;
         for (UITouch *touch in arr) {
             if ([touch isEqual:self.drawTouch]) {
@@ -395,6 +397,7 @@
         }
         
         if (isHaveTouch) {
+            NSLog(@"connet return");
             return;
         }
     }
@@ -412,9 +415,12 @@
             
             UITouch *x1 = arr[i+1];
             CGPoint point1 = [x1 locationInView:[x1 view]];
+            
             if (point.y > point1.y) {
+                NSLog(@"touch drwoafadfaf:%@",x1);
                 self.drawTouch = x1;
             }else {
+                NSLog(@"touch dasfdsafdaslewree:%@",x);
                 self.drawTouch = x;
             }
         }
@@ -500,6 +506,7 @@
     CGPoint curP = [self.drawTouch locationInView:[self.drawTouch view]];
 
     if (self.isConnectBluetooth) {
+        
         if (self.toucheID == 1) {
             if (isDraw) {
                 if (beginDate != nil) {
@@ -522,7 +529,7 @@
         }
 
     }else {
-        isDraw1 = YES;
+//        isDraw1 = YES;
         if (beginDate != nil) {
             NSDate *changeDate = [NSDate date];
             NSTimeInterval interval = [changeDate timeIntervalSinceDate:beginDate];
