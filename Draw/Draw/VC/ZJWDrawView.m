@@ -321,6 +321,7 @@
 
 - (void)drawRect:(CGRect)rect
 {
+//    NSLog(@"drawPath:%@",self.paths);
     if (self.isConnectBluetooth) {
         for (ZJWBezierPath *path in self.paths) {
             if ([path isKindOfClass:[UIImage class]]) {
@@ -382,6 +383,26 @@
 
     NSSet *allTouches = [event allTouches];
     NSArray *arr = [allTouches allObjects];
+    
+    
+    if (_isConnectBluetooth && self.toucheID == 1) {
+        BOOL isHaveTouch = NO;
+        for (UITouch *touch in arr) {
+            if ([touch isEqual:self.drawTouch]) {
+                isHaveTouch = YES;
+                NSLog(@"============>>>>>>>>have touch");
+            }
+        }
+        
+        if (isHaveTouch) {
+            return;
+        }
+    }
+    
+    
+    
+    
+//    NSLog(@"touchs  arr:%@",arr);
     self.drawTouch = arr[0];
 //    NSLog(@"%@",self.drawTouch);
     if (arr.count > 1) {
@@ -404,6 +425,7 @@
     }
 
     if (self.isConnectBluetooth) {
+        NSLog(@"isConnectBluetooth...");
         //通过贝塞尔曲线来画图
         ZJWBezierPath *path = [ZJWBezierPath bezierPath];
 
@@ -417,7 +439,8 @@
         self.path = path;
 //        isBeginConnect = NO;
         if (self.toucheID == 1) {
-            self.drawTouch = nil;
+            NSLog(@"....touch id");
+//            self.drawTouch = nil;
             [self.touchs addObjectsFromArray:arr];
             [self touchTime:nil];
 //            if (isTimeDate == NO) {
@@ -545,26 +568,34 @@
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    NSLog(@"Cancelled");
+    NSLog(@"==========>>>>>>>>>>>>>>>>>>>>>>>Cancelled");
 }
 
 - (void)touchTime:(NSTimer *)timer {
+    
+    NSLog(@"draw touch:%@",self.drawTouch);
     NSArray *arr = self.touchs;
-    self.drawTouch = arr[0];
-    if (arr.count > 1) {
-        for (int i = 0; i < arr.count-1; i++) {
-            UITouch *x = arr[i];
-            CGPoint point = [x locationInView:[x view]];
-
-            UITouch *x1 = arr[i+1];
-            CGPoint point1 = [x1 locationInView:[x1 view]];
-            if (point.y > point1.y) {
-                self.drawTouch = x1;
-            }else {
-                self.drawTouch = x;
+    if (self.isConnectBluetooth && self.toucheID == 1) {
+        
+    }
+    else {
+        self.drawTouch = arr[0];
+        if (arr.count > 1) {
+            for (int i = 0; i < arr.count-1; i++) {
+                UITouch *x = arr[i];
+                CGPoint point = [x locationInView:[x view]];
+                
+                UITouch *x1 = arr[i+1];
+                CGPoint point1 = [x1 locationInView:[x1 view]];
+                if (point.y > point1.y) {
+                    self.drawTouch = x1;
+                }else {
+                    self.drawTouch = x;
+                }
             }
         }
     }
+    NSLog(@"draw sss touch:%@",self.drawTouch);
     CGPoint curP = [self.drawTouch locationInView:[self.drawTouch view]];
 
     ZJWBezierPath *path = [ZJWBezierPath bezierPath];

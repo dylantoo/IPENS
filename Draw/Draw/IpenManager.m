@@ -191,7 +191,7 @@
 {
     NSString *result =[[ NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
     
-    //    NSLog(@"%@ \n %@ \n %@",characteristic,result,characteristic.UUID.UUIDString);
+//    NSLog(@"%@ \n %@ \n %@",characteristic,result,characteristic.UUID.UUIDString);
     
     if ([characteristic.UUID.UUIDString isEqualToString:@"2A29"]) {
         self.manufacturer = result;
