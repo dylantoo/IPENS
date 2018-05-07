@@ -15,10 +15,11 @@
 #import "ColorView.h"
 #import "UIkitBlockAdditions.h"
 #import "CoreBluetoothViewController.h"
-//#import <IpenManager/IpenManager.h>
-#import "IpenManager.h"
 #import <CoreBluetooth/CoreBluetooth.h>
 #import "SettingViewController.h"
+
+#import "IpenManager.h"
+#import "PathManager.h"
 
 #define screenW [UIScreen mainScreen].bounds.size.width
 #define screenH [UIScreen mainScreen].bounds.size.height
@@ -43,13 +44,18 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
 @property (weak, nonatomic) IBOutlet UISlider *lineWidthSlider;
 @property (assign, nonatomic) BluetoothConnectOnTheScreenType bluetoothConnectOnTheScreenType;
 
-@property (nonatomic, strong) IpenManager *ipenManager;
+
 @property (nonatomic, strong) CBPeripheral *peripheral;
 
 @property (strong, nonatomic) ZJWPhotoImg *photoView;
 @property (strong, nonatomic) ColorView *pickerColorView;
 
 @property (nonatomic, strong) SettingViewController *settingVC;
+
+
+@property (nonatomic, strong) IpenManager *ipenManager;
+@property (nonatomic, strong) PathManager *pathManager;
+
 @end
 
 @implementation ViewController
@@ -62,6 +68,7 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
     UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(btnLong:)];
     longPress.minimumPressDuration = 1; //定义按的时间
     [self.deleteLineBtn addGestureRecognizer:longPress];
+    self.deleteLineBtn.enabled = YES;
     
     self.isShowColorView = NO;
     self.drawView.delegte = self;
@@ -117,11 +124,11 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
 
 #pragma mark    - method
 - (void)changeDeleteBtnTpye {
-    if (self.drawView.isHavePath) {
-        self.deleteLineBtn.enabled = YES;
-    }else {
-        self.deleteLineBtn.enabled = NO;
-    }
+//    if (self.drawView.isHavePath) {
+//        self.deleteLineBtn.enabled = YES;
+//    }else {
+//        self.deleteLineBtn.enabled = NO;
+//    }
 }
 
 - (void)changeColorViewAniment:(BOOL)isShow {
@@ -151,7 +158,8 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
     WS(weakSelf)
     [self.ipenManager registerForNotification:^(CBPeripheral *peripheral, CBCharacteristic *characteristic) {
         weakSelf.bluetooth.text = [self getBluetoothString:[weakSelf.ipenManager getTouchState]];
-        weakSelf.drawView.toucheID = [weakSelf.ipenManager getTouchState];
+        PATHMANAGER.isPenWriting = [weakSelf.ipenManager getTouchState];
+//        weakSelf.drawView.toucheID = [weakSelf.ipenManager getTouchState];
         if (weakSelf.settingVC.managerNotificationBlock) {
             weakSelf.settingVC.managerNotificationBlock(weakSelf.ipenManager);
         }
@@ -163,18 +171,21 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
         switch (type) {
             case BluetoothTypeSuccess: {
                 weakSelf.bluetooth.text = @"连接成功";
-                weakSelf.drawView.isConnectBluetooth = YES;
+//                weakSelf.drawView.isConnectBluetooth = YES;
+                PATHMANAGER.isConnectedBlueTooth = YES;
             }
                 break;
             case BluetoothTypeFail: {
                 weakSelf.bluetooth.text = @"连接失败";
-                weakSelf.drawView.isConnectBluetooth = NO;
+                PATHMANAGER.isConnectedBlueTooth = NO;
+//                weakSelf.drawView.isConnectBluetooth = NO;
                 [weakSelf setBluetoothType:BluetoothConnectOnTheScreenTypeisNotConnect];
             }
                 break;
             case BluetoothTypeDisconnect: {
                 weakSelf.bluetooth.text = @"断开蓝牙";
-                weakSelf.drawView.isConnectBluetooth = NO;
+                PATHMANAGER.isConnectedBlueTooth = NO;
+//                weakSelf.drawView.isConnectBluetooth = NO;
                 [weakSelf setBluetoothType:BluetoothConnectOnTheScreenTypeisNotConnect];
                 [weakSelf.ipenManager reconnectToStoredDevices];
             }
@@ -186,7 +197,6 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
     }];
     [self.ipenManager selectDevice:self.peripheral];
     [self.ipenManager stopDeviceDiscovery];
-
 }
 
 - (NSString *)getBluetoothString:(int)touchState {
@@ -215,7 +225,7 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
 }
 
 - (void)btnLong:(id)sender {
-    [self.drawView deleteAll];
+    [self.drawView clear];
     [self changeDeleteBtnTpye];
 }
 

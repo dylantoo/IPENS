@@ -27,11 +27,12 @@
 @property (nonatomic, assign) BOOL isConnectBluetooth;//是否链接蓝牙
 @property (nonatomic, assign) NSInteger toucheID;//0 没有再屏幕上 1 在屏幕上
 
+//存储绘制的path
+@property (nonatomic,strong) NSMutableArray *paths;
+
 - (void)clear;
 
 - (void)deleteLast;
-
-- (void)deleteAll;
 
 - (void)lineWidthWithFloat:(CGFloat)width;
 

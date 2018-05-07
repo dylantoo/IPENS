@@ -189,6 +189,7 @@
 // 更新特征的value的时候会调用 （凡是从蓝牙传过来的数据都要经过这个回调，简单的说这个方法就是你拿数据的唯一方法） 你可以判断是否
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
+//    NSLog(@"didUpdateValueForCharacteristic:%@",characteristic);
     NSString *result =[[ NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
     
 //    NSLog(@"%@ \n %@ \n %@",characteristic,result,characteristic.UUID.UUIDString);
