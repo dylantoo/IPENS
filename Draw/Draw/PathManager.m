@@ -59,7 +59,7 @@ static PathManager *sharedObj = nil;
     self.isBuffering = YES;
     self.comingTouch = touch;
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(300.0 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, BlueToothDelay), dispatch_get_main_queue(), ^{
         self.isBuffering = NO;
     });
     
