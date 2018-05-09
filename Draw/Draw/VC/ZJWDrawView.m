@@ -223,37 +223,38 @@
 #pragma mark - Touch Events
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    NSLog(@"touchesBegan.........");
+    NSLog(@"touchesBegan.........:%@",event);
 
     NSSet *allTouches = [event allTouches];
     NSArray *arr = [allTouches allObjects];
     
+    [PATHMANAGER touchesBegin:arr];
+    
     if (arr.count>1) {
-        //右手书写习惯 取最左点
         
-        UITouch *finalTouch = nil;
-        for (int i = 0; i < arr.count-1; i++) {
-            UITouch *x = arr[i];
-            CGPoint point = [x locationInView:[x view]];
-            
-            UITouch *x1 = arr[i+1];
-            CGPoint point1 = [x1 locationInView:[x1 view]];
-            
-            if (point.y > point1.y) {
-                
-                finalTouch = x1;
-            }else {
-                
-                finalTouch = x;
-            }
-        }
-//        PATHMANAGER.comingTouch = finalTouch;
-        [PATHMANAGER setComingTouchWithBuffer:finalTouch];
         
+//        UITouch *finalTouch = nil;
+//        for (int i = 0; i < arr.count-1; i++) {
+//            UITouch *x = arr[i];
+//            CGPoint point = [x locationInView:[x view]];
+//
+//            UITouch *x1 = arr[i+1];
+//            CGPoint point1 = [x1 locationInView:[x1 view]];
+//
+//            if (point.y > point1.y) {
+//
+//                finalTouch = x1;
+//            }else {
+//
+//                finalTouch = x;
+//            }
+//        }
+//        [PATHMANAGER setComingTouchWithBuffer:finalTouch];
+
+//        [PATHMANAGER setBeginTouches:arr];
     }
     else {
-//        PATHMANAGER.comingTouch = arr[0];
-        [PATHMANAGER setComingTouchWithBuffer:arr[0]];
+//        [PATHMANAGER setComingTouchWithBuffer:arr[0]];
     }
     
     
@@ -374,34 +375,18 @@
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     NSLog(@"Moved");
-    
-    
-    
-    
-    
     NSArray *arr = [touches allObjects];
+    [PATHMANAGER touchesMove:arr];
+    [self setNeedsDisplay];
     
-    if (arr.count>1) {
-            //右手书写习惯 取最左点
-        
-        UITouch *finalTouch = nil;
-        for (int i = 0; i < arr.count-1; i++) {
-            UITouch *x = arr[i];
-            CGPoint point = [x locationInView:[x view]];
-            
-            UITouch *x1 = arr[i+1];
-            CGPoint point1 = [x1 locationInView:[x1 view]];
-            
-            if (point.y > point1.y) {
-                
-                finalTouch = x1;
-            }else {
-                
-                finalTouch = x;
-            }
-        }
-        PATHMANAGER.comingTouch = finalTouch;
-        
+    return;
+    
+    
+    /*
+    
+    
+    if (PATHMANAGER.timeTouches.count>0) {
+        [PATHMANAGER setMoveTouches:arr];
     }
     else {
         PATHMANAGER.comingTouch = arr[0];
@@ -414,10 +399,8 @@
             PATHMANAGER.comingTouch = touch;
         }
     }
+    */
     
-    [self setNeedsDisplay];
-    
-    return;
     
     
     BOOL isHaveTouch = NO;
@@ -475,7 +458,10 @@
 }
 
 -(void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    PATHMANAGER.comingTouch = nil;
+    NSLog(@"touche.....endddddddddddddddd:%@",touches);
+    [PATHMANAGER touchesEnded:[touches allObjects]];
+
+    
     
 //    NSArray *arr = [touches allObjects];
 //    for (UITouch *touch in arr) {
@@ -514,7 +500,8 @@
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    NSLog(@"==========>>>>>>>>>>>>>>>>>>>>>>>Cancelled");
+    NSLog(@"==========>>>>>>>>>>>>>>>>>>>>>>>Cancelled:%@",event);
+    [PATHMANAGER touchesCancel:[touches allObjects]];
 }
 
 - (void)touchTime:(NSTimer *)timer {
