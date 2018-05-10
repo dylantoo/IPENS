@@ -23,12 +23,7 @@
 @interface ZJWDrawView : UIView
 
 @property (nonatomic, weak) id<ZJWDrawViewDelegate>delegte;
-@property (nonatomic, assign, readonly) BOOL isHavePath;//是否有画图路径
-@property (nonatomic, assign) BOOL isConnectBluetooth;//是否链接蓝牙
-@property (nonatomic, assign) NSInteger toucheID;//0 没有再屏幕上 1 在屏幕上
 
-//存储绘制的path
-@property (nonatomic,strong) NSMutableArray *paths;
 
 - (void)clear;
 

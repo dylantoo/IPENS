@@ -8,9 +8,10 @@
 
 #import <Foundation/Foundation.h>
 #import "ZJWBezierPath.h"
-#import "DHTouch.h"
 
 #define PATHMANAGER [PathManager sharedInstance]
+
+typedef void(^RegisterContentBlock)(NSString *content);
 
 @interface PathManager : NSObject
 
@@ -32,7 +33,9 @@
 /*
  当前触屏的所有touch
  */
-@property (nonatomic, strong) NSMutableArray *holdTouches;
+@property (nonatomic, strong) NSMutableDictionary *holdTouches;
+
+
 
 /*
  保存所有画线
@@ -44,7 +47,10 @@
  */
 @property (nonatomic,strong) ZJWBezierPath *path;
 
-
+/*
+ 反馈消息block
+ */
+@property (nonatomic, copy) RegisterContentBlock contentBlock;
 
 + (PathManager *)sharedInstance;
 
@@ -53,5 +59,6 @@
 - (void)touchesMove:(NSArray *)touches;
 - (void)touchesEnded:(NSArray *)touches;
 - (void)touchesCancel:(NSArray *)touches;
+
 
 @end

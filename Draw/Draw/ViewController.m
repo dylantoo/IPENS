@@ -42,6 +42,9 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
 @property (weak, nonatomic) IBOutlet UIView *colorView;
 @property (weak, nonatomic) IBOutlet UIButton *deleteLineBtn;
 @property (weak, nonatomic) IBOutlet UISlider *lineWidthSlider;
+
+@property (nonatomic, strong) UILabel *contentLbl;
+
 @property (assign, nonatomic) BluetoothConnectOnTheScreenType bluetoothConnectOnTheScreenType;
 
 
@@ -119,7 +122,22 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
         [weakSelf gotoCoreBluetoothVC];
     };
     self.bluetooth.text = @"未连接蓝牙";
-    self.drawView.isConnectBluetooth = NO;
+    self.contentLbl = [[UILabel alloc] init];
+    self.contentLbl.backgroundColor = [UIColor clearColor];
+    self.contentLbl.textColor = [UIColor blackColor];
+    self.contentLbl.font = [UIFont systemFontOfSize:14];
+    self.contentLbl.text = @"书写信息:";
+    [self.view addSubview:self.contentLbl];
+    
+    [self.contentLbl mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.and.right.equalTo(weakSelf.view);
+        make.height.equalTo(@(30));
+        make.bottom.equalTo(weakSelf.bottomImageToolView.mas_top);
+    }];
+    
+    PATHMANAGER.contentBlock = ^(NSString *content) {
+        weakSelf.contentLbl.text = content;
+    };
 }
 
 #pragma mark    - method
@@ -157,8 +175,17 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
     self.ipenManager = ipenManager;
     WS(weakSelf)
     [self.ipenManager registerForNotification:^(CBPeripheral *peripheral, CBCharacteristic *characteristic) {
+        
+        
         weakSelf.bluetooth.text = [self getBluetoothString:[weakSelf.ipenManager getTouchState]];
         PATHMANAGER.isPenWriting = [weakSelf.ipenManager getTouchState];
+        if (PATHMANAGER.isPenWriting) {
+            weakSelf.bluetooth.backgroundColor = [UIColor yellowColor];
+        }
+        else {
+            weakSelf.bluetooth.backgroundColor = [UIColor clearColor];
+        }
+        
 //        weakSelf.drawView.toucheID = [weakSelf.ipenManager getTouchState];
         if (weakSelf.settingVC.managerNotificationBlock) {
             weakSelf.settingVC.managerNotificationBlock(weakSelf.ipenManager);
