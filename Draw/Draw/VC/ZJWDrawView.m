@@ -127,7 +127,7 @@
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    NSLog(@"Moved");
+    NSLog(@"Moved:%@",touches);
     NSArray *arr = [touches allObjects];
     [PATHMANAGER touchesMove:arr];
     [self setNeedsDisplay];

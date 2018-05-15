@@ -10,45 +10,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Draw/PathManager.m"
-            timestampString = "547656469.89973"
+            timestampString = "548101651.505631"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "278"
-            endingLineNumber = "278"
-            landmarkName = "-currentTouchFromLastTouch"
+            startingLineNumber = "257"
+            endingLineNumber = "257"
+            landmarkName = "-currentFromRightHandWrite"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[PathManager currentTouchFromLastTouch]"
-                  moduleName = "Draw"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/LLT/Desktop/Other/IPENS/Draw/Draw/PathManager.m"
-                  timestampString = "547656656.540704"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "278"
-                  endingLineNumber = "278"
-                  offsetFromSymbolStart = "96">
-               </Location>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[PathManager currentTouchFromLastTouch]"
-                  moduleName = "Draw"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/LLT/Desktop/Other/IPENS/Draw/Draw/PathManager.m"
-                  timestampString = "547656656.543813"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "278"
-                  endingLineNumber = "278"
-                  offsetFromSymbolStart = "112">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -58,12 +26,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Draw/PathManager.m"
-            timestampString = "547656666.389354"
+            timestampString = "548101651.506233"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "219"
-            endingLineNumber = "219"
-            landmarkName = "-currentTouchByAlgorithm"
+            startingLineNumber = "108"
+            endingLineNumber = "108"
+            landmarkName = "-setCurrentTouch:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

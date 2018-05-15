@@ -10,4 +10,11 @@
 
 @implementation DHTouch
 
+- (NSMutableArray *)points {
+    if (!_points) {
+        _points = [[NSMutableArray alloc] init];
+    }
+    return _points;
+}
+
 @end

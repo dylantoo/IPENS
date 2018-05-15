@@ -12,6 +12,10 @@
 #define BlueToothDelay  0.3
 #define MaxDistance     60
 
+    /// 屏幕尺寸相关
+#define MH_SCREEN_WIDTH  ([[UIScreen mainScreen] bounds].size.width)
+#define MH_SCREEN_HEIGHT ([[UIScreen mainScreen] bounds].size.height)
+
 static PathManager *sharedObj = nil;
 
 @interface PathManager()
@@ -59,6 +63,10 @@ static PathManager *sharedObj = nil;
 
 - (void)setIsConnectedBlueTooth:(BOOL)isConnectedBlueTooth {
     _isConnectedBlueTooth = isConnectedBlueTooth;
+    if (!isConnectedBlueTooth) {
+        self.currentTouch = nil;
+        self.path = nil;
+    }
 }
 
 - (void)setIsPenWriting:(BOOL)isPenWriting {
@@ -71,50 +79,46 @@ static PathManager *sharedObj = nil;
     
     
     NSLog(@"pen is writing....:%d",isPenWriting);
-    if (_isPenWriting) {
-        
-        if (self.holdTouches.count>0) {
-            self.currentTouch = [self currentTouchByAlgorithm];
-        }
-        
-    }
+//    if (_isPenWriting) {
+//
+//        if (self.holdTouches.count>0) {
+//            NSLog(@"currentTouchcurrentTouchcurrentTouch:%@",self.currentTouch);
+//            self.currentTouch = [self currentTouchByAlgorithm];
+//        }
+//        NSLog(@"afterrrrrrcurrentTouchcurrentTouchcurrentTouch:%@",self.currentTouch);
+//    }
 }
 
+
 - (void)setCurrentTouch:(UITouch *)currentTouch {
-    if (!currentTouch) {
-        self.lastTouch.touch = _currentTouch;
-        self.lastTouch.lastPoint = [_currentTouch locationInView:_currentTouch.view];
-        self.lastTouch.lastTimeStamp = _currentTouch.timestamp;
-        self.path = nil;
-    }
-    else {
+    if (currentTouch) {
         CGPoint point = [currentTouch locationInView:currentTouch.view];
         NSString *content = [NSString stringWithFormat:@"书写信息:当前点位{%f,%f}",point.x,point.y];
         self.contentBlock(content);
         
         
-        
+        NSLog(@"zzzzzzzzzzzzzzzzzzzzzzz;%@",self.path);
         if (!self.path) {
+            NSLog(@"createcatet path");
+            
+            DHTouch *curentDHTouch = (DHTouch *)[self.holdTouches objectForKey:@(currentTouch.hash)];
+            
             ZJWBezierPath *path = [ZJWBezierPath bezierPath];
                 //path创建好后，就可以设置其线宽，颜色等属性
-            [path moveToPoint:[currentTouch locationInView:currentTouch.view]];
+            [path moveToPoint:[curentDHTouch.points[0] cgPoint]];
             path.lineCapStyle = kCGLineCapRound;
             path.lineJoinStyle = kCGLineJoinRound;
             path.pathColor = [UIColor blueColor];
             path.lineWidth = 4;
             self.path = path;
             [self.paths addObject:self.path];
-        }
-        
-        //删除其他touch感应
-        for (DHTouch *touch in self.holdTouches.allValues) {
-            if(![touch.touch isEqual:currentTouch]) {
-                [self removeTouchObject:touch.touch];
+            
+            
+            for (DHPoint *dhpoint in curentDHTouch.points) {
+                [self.path addLineToPoint:[dhpoint cgPoint]];
             }
         }
-        
     }
-    
     _currentTouch = currentTouch;
 }
 
@@ -124,11 +128,12 @@ static PathManager *sharedObj = nil;
 - (void)touchesBegin:(NSArray *)touches {
     if (self.isConnectedBlueTooth) {
         for (UITouch *touch in touches) {
-            if ((touch.phase == UITouchPhaseBegan)&&![self isTouchExist:touch]) {
+            if ((touch.phase == UITouchPhaseBegan)) {//&&![self isTouchExist:touch]
                 NSLog(@"stypel...:%ld",(long)touch.type);
                 [self addTouchObject:touch];
             }
         }
+        NSLog(@"touchesBegintouchesBegintouchesBegin:%lu",(unsigned long)self.holdTouches.allValues.count);
     }
     else {
         
@@ -137,41 +142,141 @@ static PathManager *sharedObj = nil;
 
 - (void)touchesMove:(NSArray *)touches {
     for (UITouch *touch in touches) {
-        if ([touch isEqual:self.currentTouch]) {
-            CGPoint point = [touch locationInView:touch.view];
-            self.contentBlock([NSString stringWithFormat:@"书写信息:当前点位{%f,%f}",point.x,point.y]);
-            
-            CGPoint curPoint = [self.currentTouch locationInView:self.currentTouch.view];
-            [self addLineToPoint:curPoint];
+        if (self.isPenWriting&&touch.phase==UITouchPhaseMoved) {
+            if (!self.currentTouch) {
+                if (self.holdTouches.allValues.count>1) {
+//                    for (DHTouch *dhtouch in self.holdTouches.allValues) {
+//                        if ([dhtouch.touch isEqual:touch]) {
+//                            NSLog(@"existDTouchexistDTouchexistDTouch:%@",dhtouch.touch);
+//                            CGPoint point = [touch locationInView:touch.view];
+//                            [dhtouch.points addObject:[DHPoint dhPointWithCGPoint:point]];
+//                        }
+//                    }
+                    
+                    
+                    DHTouch *existDTouch = (DHTouch *)[self.holdTouches objectForKey:@(touch.hash)];
+                    NSLog(@"existDTouchexistDTouchexistDTouch:%@",existDTouch);
+                    if (existDTouch) {
+                        CGPoint point = [touch locationInView:touch.view];
+                        [existDTouch.points addObject:[DHPoint dhPointWithCGPoint:point]];
+                    }
+                    
+                    if ([self isHandWriting]) {
+                        self.currentTouch = [self currentFromRightHandWrite];
+                    }
+                    else {
+                        self.currentTouch = [self currentFromLineDistance];
+                    }
+                    if (self.currentTouch) {
+                        CGPoint curPoint = [self.currentTouch locationInView:self.currentTouch.view];
+                        self.contentBlock([NSString stringWithFormat:@"书写信息:当前点位{%f,%f}",curPoint.x,curPoint.y]);
+                            //                self.currentTouch = touch;
+                        
+                        [self addLineToPoint:curPoint];
+                    }
+                }
+                else {
+                    self.currentTouch = touch;
+                    CGPoint curPoint = [self.currentTouch locationInView:self.currentTouch.view];
+                    self.contentBlock([NSString stringWithFormat:@"书写信息:当前点位{%f,%f}",curPoint.x,curPoint.y]);
+                        //                self.currentTouch = touch;
+                    
+                    [self addLineToPoint:curPoint];
+                }
+            }
+            else {
+                CGPoint curPoint = [self.currentTouch locationInView:self.currentTouch.view];
+                [self addLineToPoint:curPoint];
+                self.contentBlock([NSString stringWithFormat:@"书写信息:当前点位{%f,%f}",curPoint.x,curPoint.y]);
+            }
         }
     }
+    
 }
 
 - (void)touchesEnded:(NSArray *)touches {
     for (UITouch *touch in touches) {
         if ((touch.phase == UITouchPhaseEnded)&&[self isTouchExist:touch]) {
             [self removeTouchObject:touch];
-            
-            if ([touch isEqual:self.currentTouch]) {
-                self.currentTouch = nil;
-            }
         }
     }
+    NSLog(@"touchesEndedtouchesEndedtouchesEnded:%lu",self.holdTouches.count);
 }
 
 - (void)touchesCancel:(NSArray *)touches {
     for (UITouch *touch in touches) {
         if ((touch.phase == UITouchPhaseCancelled)&&[self isTouchExist:touch]) {
             [self removeTouchObject:touch];
-            
-            if ([touch isEqual:self.currentTouch]) {
-                self.currentTouch = nil;
-            }
         }
     }
+    NSLog(@"touchesCanceltouchesCanceltouchesCancel:%lu",self.holdTouches.count);
 }
 
 #pragma mark - algorithm
+/*
+ 根据touch 划线距离判断
+ */
+- (UITouch *)currentFromLineDistance {
+    for (DHTouch *dhtouch in self.holdTouches.allValues) {
+        if (dhtouch.points.count>2) {
+            DHPoint *dpoint1 = dhtouch.points[dhtouch.points.count-1];
+            DHPoint *dpoint2 = dhtouch.points[dhtouch.points.count-2];
+            
+            CGPoint point1 = [dpoint1 cgPoint];
+            CGPoint point2 = [dpoint2 cgPoint];
+            
+            if ( sqrtf((point1.x-point2.x)*(point1.x-point2.x)+(point1.y-point2.y)*(point1.y-point2.y))>10)  {
+                return dhtouch.touch;
+            }
+        }
+    }
+    return nil;
+}
+
+/*
+ 是否在手写
+ touch事件必须大于2
+ */
+- (BOOL)isHandWriting {
+    DHTouch *dhtouch = self.holdTouches.allValues[0];
+    DHTouch *dhtouch1 = self.holdTouches.allValues[1];
+    CGPoint point = [(DHPoint *)dhtouch.points[0] cgPoint];
+    CGPoint point1 = [(DHPoint *)dhtouch1.points[0] cgPoint];
+    if ((point.x>MH_SCREEN_WIDTH/2.0&&point.y>MH_SCREEN_HEIGHT/2.0)&&(point1.x>MH_SCREEN_WIDTH/2.0&&point1.y>MH_SCREEN_HEIGHT/2.0)) {
+        return YES;
+    }
+    else {
+        return NO;
+    }
+}
+
+/*
+ 手写取最左侧的touch
+ */
+- (UITouch *)currentFromRightHandWrite {
+    int index = 0;
+    for (int i =1; i<self.holdTouches.allValues.count; i++) {
+        
+        
+        /*
+         右手握笔 判定左边点
+         */
+        
+        DHTouch *dhtouch1 = (DHTouch *)self.holdTouches.allValues[index];
+        DHTouch *dhtouch2 = (DHTouch *)self.holdTouches.allValues[i];
+        CGPoint point1 = [dhtouch1.points[0] cgPoint];
+        CGPoint point2 = [dhtouch2.points[0] cgPoint];
+        if (point1.x<point2.x) {
+            
+        }
+        else {
+            index = i;
+        }
+    }
+    return ((DHTouch *)self.holdTouches.allValues[index]).touch;
+}
+
+
 /*
     point 不能为原点  与 上一个点不能距离过长
  */
@@ -181,19 +286,20 @@ static PathManager *sharedObj = nil;
             return;
         }
         
-        if (self.paths.count>0) {
-            ZJWBezierPath *bPath = self.paths.lastObject;
-            
-            CGPoint lastPoint = bPath.currentPoint;
-            CGFloat a = fabs(lastPoint.x-point.x);
-            CGFloat b = fabs(lastPoint.y-point.y);
-            if (sqrtf(a*a+b*b)>50) {
-                return;
-            }
-
-            
-            [bPath addLineToPoint:point];
-        }
+        [self.path addLineToPoint:point];
+//        if (self.paths.count>0) {
+//            ZJWBezierPath *bPath = self.paths.lastObject;
+//
+//            CGPoint lastPoint = bPath.currentPoint;
+//            CGFloat a = fabs(lastPoint.x-point.x);
+//            CGFloat b = fabs(lastPoint.y-point.y);
+////            if (sqrtf(a*a+b*b)>50) {
+////                return;
+////            }
+//
+//
+//            [bPath addLineToPoint:point];
+//        }
         
     }
 }
@@ -293,16 +399,36 @@ static PathManager *sharedObj = nil;
  touches 存储变化的时候
  */
 - (void)addTouchObject:(UITouch *)touch {
-    if (!self.isPenWriting&&!self.currentTouch) {//
+//    if (!self.isPenWriting&&[self mh_isNullOrNil:self.currentTouch]) {//
+        NSLog(@"addTouchObjectaddTouchObjectaddTouchObject");
         DHTouch *dhtouch = [[DHTouch alloc] init];
         dhtouch.touch = touch;
         dhtouch.beginTimStamp = touch.timestamp;
+    CGPoint point = [touch locationInView:touch.view];
+    [dhtouch.points addObject:[DHPoint dhPointWithCGPoint:point]];
         [self.holdTouches setObject:dhtouch forKey:@(touch.hash)];
-    }
+//    }
+//    else if(self.isPenWriting && !self.currentTouch) {
+//        //短暂提笔 写第二笔的情况
+//        DHTouch *dhtouch = [[DHTouch alloc] init];
+//        dhtouch.touch = touch;
+//        dhtouch.beginTimStamp = touch.timestamp;
+//        [self.holdTouches setObject:dhtouch forKey:@(touch.hash)];
+//    }
 }
 
 - (void)removeTouchObject:(UITouch *)touch {
+    DHTouch *dhtouch = self.holdTouches[@(touch.hash)];
+    if ([dhtouch.touch isEqual:self.currentTouch]) {
+        self.currentTouch = nil;
+        self.path = nil;
+    }
     [self.holdTouches removeObjectForKey:@(touch.hash)];
+}
+
+- (BOOL)mh_isNullOrNil:(id)obj {
+    return !obj || [obj isKindOfClass:[NSNull class]];
+    
 }
 
 @end

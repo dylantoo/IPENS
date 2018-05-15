@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DHPoint.h"
 
-@interface DHTouch : UITouch
+@interface DHTouch : NSObject
 
 @property (nonatomic, strong) UITouch *touch;
 
@@ -26,5 +27,11 @@
  point  end or cancel
  */
 @property (nonatomic) CGPoint lastPoint;
+
+/*
+ points array
+ store DHPoint 
+ */
+@property (nonatomic, strong) NSMutableArray *points;
 
 @end

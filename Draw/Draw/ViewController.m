@@ -57,7 +57,6 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
 
 
 @property (nonatomic, strong) IpenManager *ipenManager;
-@property (nonatomic, strong) PathManager *pathManager;
 
 @end
 
@@ -233,7 +232,7 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
         [self setBluetoothType:BluetoothConnectOnTheScreenTypeisConnectAndOnTheScreen];
         string = @"在屏幕上";
     }
-    return [NSString stringWithFormat:@"笔触状态:%@",string];
+    return [NSString stringWithFormat:@"电量:%d%%, 笔触状态:%@",[self.ipenManager getBatteryState],string];
 }
 
 - (void)setBluetoothType:(BluetoothConnectOnTheScreenType)type {
