@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ZJWBezierPath.h"
+#import "DHTouch.h"
 
 #define PATHMANAGER [PathManager sharedInstance]
 
@@ -28,8 +29,7 @@ typedef void(^RegisterContentBlock)(NSString *content);
 /*
  当前认定的触电
  */
-@property (nonatomic, strong) UITouch *currentTouch;
-//@property (nonatomic, strong) DHTouch *curDHTouch;
+@property (nonatomic, strong) DHTouch *curDHTouch;
 
 /*
  当前触屏的所有touch
