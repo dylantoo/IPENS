@@ -127,20 +127,25 @@
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    NSLog(@"Moved:%@",touches);
-    NSArray *arr = [touches allObjects];
+    NSLog(@"Moved:%@",event);
+    NSSet *allTouches = [event allTouches];
+    NSArray *arr = [allTouches allObjects];
     [PATHMANAGER touchesMove:arr];
     [self setNeedsDisplay];
 }
 
 -(void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    NSLog(@"touche.....endddddddddddddddd:%@",touches);
-    [PATHMANAGER touchesEnded:[touches allObjects]];
+    NSLog(@"touche.....endddddddddddddddd:%@",event);
+    NSSet *allTouches = [event allTouches];
+    NSArray *arr = [allTouches allObjects];
+    [PATHMANAGER touchesEnded:arr];
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     NSLog(@"==========>>>>>>>>>>>>>>>>>>>>>>>Cancelled:%@",event);
-    [PATHMANAGER touchesCancel:[touches allObjects]];
+    NSSet *allTouches = [event allTouches];
+    NSArray *arr = [allTouches allObjects];
+    [PATHMANAGER touchesEnded:arr];
 }
 
 @end

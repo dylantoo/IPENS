@@ -11,6 +11,8 @@
 
 #define BlueToothDelay  0.3
 #define MaxDistance     60
+//判定笔书写的最短距离
+#define MinDistance     10
 
     /// 屏幕尺寸相关
 #define MH_SCREEN_WIDTH  ([[UIScreen mainScreen] bounds].size.width)
@@ -85,6 +87,10 @@ static PathManager *sharedObj = nil;
         }
         NSLog(@"afterrrrrrcurrentTouchcurrentTouchcurrentTouch:%@",self.curDHTouch);
     }
+    else {
+        //新增考虑
+//        self.curDHTouch = nil;
+    }
 }
 
 - (void)setCurDHTouch:(DHTouch *)curDHTouch {
@@ -150,8 +156,12 @@ static PathManager *sharedObj = nil;
         
         if (self.isPenWriting&&!self.curDHTouch) {
             NSLog(@"!self.isPenWriting&&!self.curDHTouch");
-            self.curDHTouch = [self currentFromLineDistance];
+            DHTouch *distanceTouch = [self currentFromLineDistance];
+            if (distanceTouch) {
+                self.curDHTouch = distanceTouch;
+            }
         }
+        
         
         if (self.curDHTouch) {
             CGPoint curPoint = [[self.curDHTouch.points lastObject] cgPoint];
@@ -188,7 +198,11 @@ static PathManager *sharedObj = nil;
  根据touch 划线距离判断
  */
 - (DHTouch *)currentFromLineDistance {
-    for (DHTouch *dhtouch in self.holdTouches.allValues) {
+    NSLog(@"currentFromLineDistanceBegin");
+    int index = 0;
+    BOOL isHasPenWriting = NO;
+    for (int i =0; i<self.holdTouches.allValues.count; i++) {
+        DHTouch *dhtouch = self.holdTouches.allValues[i];
         if (dhtouch.points.count>2) {
             DHPoint *dpoint1 = dhtouch.points[dhtouch.points.count-1];
             DHPoint *dpoint2 = dhtouch.points[dhtouch.points.count-2];
@@ -196,11 +210,18 @@ static PathManager *sharedObj = nil;
             CGPoint point1 = [dpoint1 cgPoint];
             CGPoint point2 = [dpoint2 cgPoint];
             
-            if ( sqrtf((point1.x-point2.x)*(point1.x-point2.x)+(point1.y-point2.y)*(point1.y-point2.y))>10)  {
-                return dhtouch;
+            if ( sqrtf((point1.x-point2.x)*(point1.x-point2.x)+(point1.y-point2.y)*(point1.y-point2.y))>10.0)  {
+                index = i;
+                isHasPenWriting = YES;
             }
         }
     }
+    
+    if (isHasPenWriting) {
+        return self.holdTouches.allValues[index];
+    }
+    
+    NSLog(@"currentFromLineDistanceAfter");
     return nil;
 }
 
@@ -299,30 +320,68 @@ static PathManager *sharedObj = nil;
     }
     else if(self.holdTouches.allValues.count>1) {
         //有多点
-        return [self currentTouchFromLeastInterval];
+        DHTouch *leastTouch = [self currentTouchFromLeastInterval];
+        if (leastTouch) {
+            return leastTouch;
+        }
     }
     return nil;
 }
 
 
-/*
+/**
  根据蓝牙笔触上报时间距离最近的为 currentTouch
  */
 - (DHTouch *)currentTouchFromLeastInterval {
         //系统开机时间
     NSProcessInfo *info = [NSProcessInfo processInfo];
     NSTimeInterval now = info.systemUptime;
-    NSLog(@"%f", info.systemUptime);
-    NSLog(@"aaaaaaaaaaarray:%@",self.holdTouches);
+//    NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+    NSLog(@"%f", now);
+   
+    NSLog(@"aaaaaaaaaaarray::::");
+    for (DHTouch *t in self.holdTouches.allValues) {
+        NSLog(@"%@ time:%f hash:%@",t.touch,t.beginTimStamp,@(t.hash));
+    }
+
     int index = 0;
-    for (int i =1; i<self.holdTouches.allKeys.count; i++) {
+    
+    BOOL isHasPenWriting = NO;
+    for (int j=0; j<self.holdTouches.allValues.count; j++) {
+        NSTimeInterval first = ((DHTouch *)self.holdTouches.allValues[j]).beginTimStamp;
+        NSLog(@"fabbbbbbbbs:%f",fabs(first-now));
+        if (fabs(first-now)<BlueToothDelay) {
+            index = j;
+            isHasPenWriting = YES;
+            break;
+        }
+    }
+    
+    if (!isHasPenWriting) {
+        return nil;
+    }
+    for (int i = index+1; i<self.holdTouches.allKeys.count; i++) {
         //时间戳最接近蓝牙笔触上报时间点
-        NSTimeInterval first = ((DHTouch *)self.holdTouches.allValues[index]).beginTimStamp;
-        NSTimeInterval second = ((DHTouch *)self.holdTouches.allValues[i]).beginTimStamp;
+        DHTouch *dtouch1 = (DHTouch *)self.holdTouches.allValues[index];
+        DHTouch *dtouch2 = (DHTouch *)self.holdTouches.allValues[i];
+        NSTimeInterval first = dtouch1.beginTimStamp;
+        NSTimeInterval second = dtouch2.beginTimStamp;
         NSLog(@"touch time:%f,%f",first,second);
-        if (fabs(first-now) <= fabs(second-now)) {
+        if (fabs(first-now) < fabs(second-now)) {
 //            index = i;
         }
+        else if (fabs(first-now) == fabs(second-now)) {
+            //如果时间相同 左撇子靠左的点
+            CGFloat x1 = [dtouch1.points[0] cgPoint].x;
+            CGFloat x2 = [dtouch2.points[0] cgPoint].x;
+            if (x1<x2) {
+                
+            }
+            else {
+                index = i;
+            }
+        }
+        
         else {
             index = i;
         }
@@ -370,10 +429,10 @@ static PathManager *sharedObj = nil;
  */
 - (void)addTouchObject:(UITouch *)touch {
 //    if (!self.isPenWriting&&[self mh_isNullOrNil:self.currentTouch]) {//
-    NSLog(@"addTouchObjectaddTouchObjectaddTouchObject");
+    NSLog(@"addTouchObjectaddTouchObjectaddTouchObject:%f",touch.timestamp);
     DHTouch *dhtouch = [[DHTouch alloc] init];
     dhtouch.touch = touch;
-    dhtouch.beginTimStamp = touch.timestamp;
+    dhtouch.beginTimStamp =  touch.timestamp;
     CGPoint point = [touch locationInView:touch.view];
     [dhtouch.points addObject:[DHPoint dhPointWithCGPoint:point]];
     [self.holdTouches setObject:dhtouch forKey:@(touch.hash)];
@@ -389,8 +448,10 @@ static PathManager *sharedObj = nil;
 
 - (void)removeTouchObject:(UITouch *)touch {
     DHTouch *dhtouch = self.holdTouches[@(touch.hash)];
-    if (dhtouch.touch.hash ==self.curDHTouch.touch.hash) {
-        self.curDHTouch = nil;
+    if (self.curDHTouch) {
+        if (dhtouch.touch.hash ==self.curDHTouch.touch.hash) {
+            self.curDHTouch = nil;
+        }
     }
     [self.holdTouches removeObjectForKey:@(touch.hash)];
 }
