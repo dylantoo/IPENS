@@ -10,13 +10,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Draw/PathManager.m"
-            timestampString = "548270564.860093"
+            timestampString = "548524571.827523"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "249"
-            endingLineNumber = "249"
-            landmarkName = "-currentFromRightHandWrite"
-            landmarkType = "7">
+            startingLineNumber = "320"
+            endingLineNumber = "320"
+            landmarkName = "PathManager"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

@@ -131,7 +131,10 @@
     NSSet *allTouches = [event allTouches];
     NSArray *arr = [allTouches allObjects];
     [PATHMANAGER touchesMove:arr];
-    [self setNeedsDisplay];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setNeedsDisplay];
+    });
 }
 
 -(void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {

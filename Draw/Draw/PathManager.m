@@ -12,7 +12,7 @@
 #define BlueToothDelay  0.3
 #define MaxDistance     60
 //判定笔书写的最短距离
-#define MinDistance     10
+#define MinDistance     20
 
     /// 屏幕尺寸相关
 #define MH_SCREEN_WIDTH  ([[UIScreen mainScreen] bounds].size.width)
@@ -80,7 +80,14 @@ static PathManager *sharedObj = nil;
     if (_isPenWriting) {
         if (self.holdTouches.count>0) {
             NSLog(@"currentTouchcurrentTouchcurrentTouch:%@",self.curDHTouch);
-            self.curDHTouch = [self currentTouchByAlgorithm];
+            if (self.paths.count==0) {
+                NSLog(@"第一笔");
+                self.curDHTouch = [self currentTouchByAlgorithm];
+            }
+            else if(self.paths.count>0) {
+                NSLog(@"中间的某笔");
+                self.curDHTouch = [self currentFromRightHandWrite];
+            }
         }
         else {
             //笔触信号先到达
@@ -88,8 +95,8 @@ static PathManager *sharedObj = nil;
         NSLog(@"afterrrrrrcurrentTouchcurrentTouchcurrentTouch:%@",self.curDHTouch);
     }
     else {
-        //新增考虑
-//        self.curDHTouch = nil;
+        //新增考虑，需要增加，不然会有飞线的可能
+        self.curDHTouch = nil;
     }
 }
 
@@ -205,12 +212,12 @@ static PathManager *sharedObj = nil;
         DHTouch *dhtouch = self.holdTouches.allValues[i];
         if (dhtouch.points.count>2) {
             DHPoint *dpoint1 = dhtouch.points[dhtouch.points.count-1];
-            DHPoint *dpoint2 = dhtouch.points[dhtouch.points.count-2];
+            DHPoint *dpoint2 = dhtouch.points[0];
             
             CGPoint point1 = [dpoint1 cgPoint];
             CGPoint point2 = [dpoint2 cgPoint];
             
-            if ( sqrtf((point1.x-point2.x)*(point1.x-point2.x)+(point1.y-point2.y)*(point1.y-point2.y))>10.0)  {
+            if ( sqrtf((point1.x-point2.x)*(point1.x-point2.x)+(point1.y-point2.y)*(point1.y-point2.y))>MinDistance)  {
                 index = i;
                 isHasPenWriting = YES;
             }
@@ -245,7 +252,7 @@ static PathManager *sharedObj = nil;
 /*
  手写取最左侧的touch
  */
-- (UITouch *)currentFromRightHandWrite {
+- (DHTouch *)currentFromRightHandWrite {
     int index = 0;
     for (int i =1; i<self.holdTouches.allValues.count; i++) {
         
@@ -265,7 +272,7 @@ static PathManager *sharedObj = nil;
             index = i;
         }
     }
-    return ((DHTouch *)self.holdTouches.allValues[index]).touch;
+    return (DHTouch *)self.holdTouches.allValues[index];
 }
 
 

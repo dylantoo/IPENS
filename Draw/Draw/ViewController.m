@@ -177,8 +177,17 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
         
         
         weakSelf.bluetooth.text = [self getBluetoothString:[weakSelf.ipenManager getTouchState]];
-        PATHMANAGER.isPenWriting = [weakSelf.ipenManager getTouchState];
-        if (PATHMANAGER.isPenWriting) {
+        BOOL PenState = [weakSelf.ipenManager getTouchState];
+//        NSLog(@"准备延迟操作....");
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//            NSLog(@"延迟操作.....0.03");
+            PATHMANAGER.isPenWriting = PenState;
+//            NSLog(@"%@", [NSThread currentThread]);
+            
+        });
+        
+        
+        if (PenState) {
             weakSelf.bluetooth.backgroundColor = [UIColor yellowColor];
         }
         else {
