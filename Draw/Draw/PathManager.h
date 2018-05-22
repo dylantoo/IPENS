@@ -10,6 +10,7 @@
 #import "ZJWBezierPath.h"
 #import "DHTouch.h"
 
+#define BlueToothDelay  0.3
 #define PATHMANAGER [PathManager sharedInstance]
 
 typedef void(^RegisterContentBlock)(NSString *content);
@@ -25,6 +26,11 @@ typedef void(^RegisterContentBlock)(NSString *content);
  接收到笔触信号 , 蓝牙笔是否在写
  */
 @property (nonatomic) BOOL isPenWriting;
+
+/*
+ 蓝牙上报时的timestamp，用于比较晚到的touch
+ */
+@property (nonatomic) NSTimeInterval writingTimeStamp;
 
 /*
  当前认定的触电

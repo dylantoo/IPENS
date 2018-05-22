@@ -178,14 +178,17 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
         
         weakSelf.bluetooth.text = [self getBluetoothString:[weakSelf.ipenManager getTouchState]];
         BOOL PenState = [weakSelf.ipenManager getTouchState];
-//        NSLog(@"准备延迟操作....");
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//            NSLog(@"延迟操作.....0.03");
-            PATHMANAGER.isPenWriting = PenState;
-//            NSLog(@"%@", [NSThread currentThread]);
-            
-        });
         
+        if (PenState) {
+            NSProcessInfo *info = [NSProcessInfo processInfo];
+            NSTimeInterval now = info.systemUptime;
+            NSLog(@"蓝牙上报时间戳:%f", now);
+        }
+//        NSLog(@"ipenManager getTouchState:%d",PenState);
+        PATHMANAGER.isPenWriting = PenState;
+//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(BlueToothDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//            PATHMANAGER.isPenWriting = PenState;
+//        });
         
         if (PenState) {
             weakSelf.bluetooth.backgroundColor = [UIColor yellowColor];
@@ -194,7 +197,6 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
             weakSelf.bluetooth.backgroundColor = [UIColor clearColor];
         }
         
-//        weakSelf.drawView.toucheID = [weakSelf.ipenManager getTouchState];
         if (weakSelf.settingVC.managerNotificationBlock) {
             weakSelf.settingVC.managerNotificationBlock(weakSelf.ipenManager);
         }

@@ -118,16 +118,19 @@
 #pragma mark - Touch Events
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    NSLog(@"touchesBegan.........:%@",event);
+//    NSLog(@"touchesBegan.........:%@",event);
 
     NSSet *allTouches = [event allTouches];
     NSArray *arr = [allTouches allObjects];
     
     [PATHMANAGER touchesBegin:arr];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setNeedsDisplay];
+    });
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    NSLog(@"Moved:%@",event);
+//    NSLog(@"Moved:%@",event);
     NSSet *allTouches = [event allTouches];
     NSArray *arr = [allTouches allObjects];
     [PATHMANAGER touchesMove:arr];
@@ -142,6 +145,9 @@
     NSSet *allTouches = [event allTouches];
     NSArray *arr = [allTouches allObjects];
     [PATHMANAGER touchesEnded:arr];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setNeedsDisplay];
+    });
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
@@ -149,6 +155,9 @@
     NSSet *allTouches = [event allTouches];
     NSArray *arr = [allTouches allObjects];
     [PATHMANAGER touchesEnded:arr];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setNeedsDisplay];
+    });
 }
 
 @end

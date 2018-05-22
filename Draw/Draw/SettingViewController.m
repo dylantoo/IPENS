@@ -144,6 +144,7 @@
         [weakSelf.datas addObject:[NSString stringWithFormat:@"公司名称：%@",[ipenManager getManufacturer]]];
         [weakSelf.datas addObject:[NSString stringWithFormat:@"固件版本：%@",[ipenManager getFirmware]]];
         [weakSelf.datas addObject:[NSString stringWithFormat:@"软件版本：%@",[ipenManager getSoftware]]];
+        [weakSelf.datas addObject:[NSString stringWithFormat:@"App版本：%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]];
         [weakSelf.myTableView reloadData];
     };
 }
