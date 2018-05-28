@@ -10,25 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Draw/PathManager.m"
-            timestampString = "549215383.458397"
+            timestampString = "549219599.7190779"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "548"
-            endingLineNumber = "548">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Draw/PathManager.m"
-            timestampString = "549215383.458739"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "355"
-            endingLineNumber = "355"
+            startingLineNumber = "364"
+            endingLineNumber = "364"
             landmarkName = "-currentTouchByAlgorithm"
             landmarkType = "7">
          </BreakpointContent>

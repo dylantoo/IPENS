@@ -7,13 +7,15 @@
 //
 
 #import "PathManager.h"
+#import "PathManager+Utility.h"
 
 #define MaxDistance     60
 //判定笔书写的最短距离
 #define MinDistance     20
 
 //判定掌控的值
-#define PalmRadius      13
+#define PalmRadius      8
+#define PalmRadiusMin      4
 
     //连续写时间距离间隔
 #define ContinueMaxDistance  50
@@ -362,12 +364,14 @@ static PathManager *sharedObj = nil;
         NSLog(@"only major :%f %f %f",dhtouch.touch.majorRadius,dhtouch.touch.majorRadiusTolerance,cent);
         
         
-        if ((cent<PalmRadius)) {//(abs<BlueToothDelay)&&
+        if ((cent<PalmRadius)&&cent>PalmRadiusMin) {//(abs<BlueToothDelay)&&
             
+            return dhtouch;
+            /*
             ZJWBezierPath *lastPath = [self.paths lastObject];
             CGPoint lastPoint = lastPath.currentPoint;
             
-            if (fabs(lastPath.endTimeStamp-dhtouch.beginTimStamp)<0.1) {
+            if (fabs(lastPath.endTimeStamp-dhtouch.beginTimStamp)<ContinueMaxTime) {
                 NSLog(@"当前点与之前的点时间间隔太近了。。。。。");
                 if ([self distanceFrom:lastPoint toPoint:[dhtouch.points[0] cgPoint]]<ContinueMaxDistance) {
                     NSLog(@"当前点与之前的点在特定距离之内。。。。");
@@ -378,7 +382,7 @@ static PathManager *sharedObj = nil;
 //                NSLog(@"正常点位书写......");
                 return dhtouch;
             }
-            
+            */
             
         }
         NSLog(@"only return nil");
@@ -409,7 +413,7 @@ static PathManager *sharedObj = nil;
     NSMutableArray *realArray = [NSMutableArray array];
     for (DHTouch *t in self.holdTouches.allValues) {
         NSLog(@"%@ time:%f hash:%@",t.touch,t.beginTimStamp,@(t.hash));
-        if (((t.touch.majorRadius/t.touch.majorRadiusTolerance)<PalmRadius)) {//(fabs(t.beginTimStamp-self.writingTimeStamp)<BlueToothDelay)&&
+        if (((t.touch.majorRadius/t.touch.majorRadiusTolerance)<PalmRadius)&&((t.touch.majorRadius/t.touch.majorRadiusTolerance)>PalmRadiusMin)) {//(fabs(t.beginTimStamp-self.writingTimeStamp)<BlueToothDelay)&&
             
             ZJWBezierPath *lastPath = [self.paths lastObject];
             CGPoint lastPoint = lastPath.currentPoint;
@@ -529,19 +533,5 @@ static PathManager *sharedObj = nil;
     [self.holdTouches removeObjectForKey:@(touch.hash)];
 }
 
-- (BOOL)mh_isNullOrNil:(id)obj {
-    return !obj || [obj isKindOfClass:[NSNull class]];
-    
-}
-
-- (NSTimeInterval)nowTimeStamp {
-    NSProcessInfo *info = [NSProcessInfo processInfo];
-    NSTimeInterval now = info.systemUptime;
-    return now;
-}
-
-- (CGFloat)distanceFrom:(CGPoint)point1 toPoint:(CGPoint)point2 {
-    return sqrtf((point1.x-point2.x)*(point1.x-point2.x)+(point1.y-point2.y)*(point1.y-point2.y));
-}
 
 @end
