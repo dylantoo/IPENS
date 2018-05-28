@@ -15,6 +15,11 @@
 //判定掌控的值
 #define PalmRadius      13
 
+    //连续写时间距离间隔
+#define ContinueMaxDistance  50
+#define ContinueMaxTime      0.3
+
+
     /// 屏幕尺寸相关
 #define MH_SCREEN_WIDTH  ([[UIScreen mainScreen] bounds].size.width)
 #define MH_SCREEN_HEIGHT ([[UIScreen mainScreen] bounds].size.height)
@@ -129,7 +134,7 @@ static PathManager *sharedObj = nil;
             
             
             for (DHPoint *dhpoint in curDHTouch.points) {
-                [self.path addLineToPoint:[dhpoint cgPoint]];
+                [self addLineToPoint:[dhpoint cgPoint]];
             }
         }
     }
@@ -303,6 +308,10 @@ static PathManager *sharedObj = nil;
             return;
         }
         
+        NSProcessInfo *info = [NSProcessInfo processInfo];
+        NSTimeInterval now = info.systemUptime;
+        self.path.endTimeStamp = now;
+        self.path.endPoint = point;
         [self.path addLineToPoint:point];
 //        if (self.paths.count>0) {
 //            ZJWBezierPath *bPath = self.paths.lastObject;
@@ -353,8 +362,24 @@ static PathManager *sharedObj = nil;
         NSLog(@"only major :%f %f %f",dhtouch.touch.majorRadius,dhtouch.touch.majorRadiusTolerance,cent);
         
         
-        if ((abs<BlueToothDelay)&&(cent<PalmRadius)) {
-            return dhtouch;
+        if ((cent<PalmRadius)) {//(abs<BlueToothDelay)&&
+            
+            ZJWBezierPath *lastPath = [self.paths lastObject];
+            CGPoint lastPoint = lastPath.currentPoint;
+            
+            if (fabs(lastPath.endTimeStamp-dhtouch.beginTimStamp)<0.1) {
+                NSLog(@"当前点与之前的点时间间隔太近了。。。。。");
+                if ([self distanceFrom:lastPoint toPoint:[dhtouch.points[0] cgPoint]]<ContinueMaxDistance) {
+                    NSLog(@"当前点与之前的点在特定距离之内。。。。");
+                    return dhtouch;
+                }
+            }
+            else {
+//                NSLog(@"正常点位书写......");
+                return dhtouch;
+            }
+            
+            
         }
         NSLog(@"only return nil");
         return nil;
@@ -384,10 +409,24 @@ static PathManager *sharedObj = nil;
     NSMutableArray *realArray = [NSMutableArray array];
     for (DHTouch *t in self.holdTouches.allValues) {
         NSLog(@"%@ time:%f hash:%@",t.touch,t.beginTimStamp,@(t.hash));
-        if ((fabs(t.beginTimStamp-self.writingTimeStamp)<BlueToothDelay)&&((t.touch.majorRadius/t.touch.majorRadiusTolerance)<PalmRadius)) {
-            [realArray addObject:t];
+        if (((t.touch.majorRadius/t.touch.majorRadiusTolerance)<PalmRadius)) {//(fabs(t.beginTimStamp-self.writingTimeStamp)<BlueToothDelay)&&
+            
+            ZJWBezierPath *lastPath = [self.paths lastObject];
+            CGPoint lastPoint = lastPath.currentPoint;
+            
+            
+            if (fabs(lastPath.endTimeStamp-t.beginTimStamp)<ContinueMaxTime) {
+                NSLog(@"当前点与之前的点时间间隔太近了。。。。。");
+                if ([self distanceFrom:lastPoint toPoint:[t.points[0] cgPoint]]<ContinueMaxDistance) {
+                    NSLog(@"当前点与之前的点在特定距离之内。。。。");
+                    [realArray addObject:t];
+                }
+            }
+            else {
+                NSLog(@"正常点位书写......");
+                [realArray addObject:t];
+            }
         }
-        
     }
     
     if (realArray.count==0) {
@@ -493,6 +532,16 @@ static PathManager *sharedObj = nil;
 - (BOOL)mh_isNullOrNil:(id)obj {
     return !obj || [obj isKindOfClass:[NSNull class]];
     
+}
+
+- (NSTimeInterval)nowTimeStamp {
+    NSProcessInfo *info = [NSProcessInfo processInfo];
+    NSTimeInterval now = info.systemUptime;
+    return now;
+}
+
+- (CGFloat)distanceFrom:(CGPoint)point1 toPoint:(CGPoint)point2 {
+    return sqrtf((point1.x-point2.x)*(point1.x-point2.x)+(point1.y-point2.y)*(point1.y-point2.y));
 }
 
 @end
