@@ -11,6 +11,7 @@
 		263A962D20A0A8BE00B911F6 /* DHPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 263A962C20A0A8BE00B911F6 /* DHPoint.m */; };
 		264D612B20A463A7002D71A1 /* DHTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = 264D612A20A463A7002D71A1 /* DHTouch.m */; };
 		2663181620BC641B00B637D4 /* PathManager+Utility.m in Sources */ = {isa = PBXBuildFile; fileRef = 2663181520BC641B00B637D4 /* PathManager+Utility.m */; };
+		2663181820BD341700B637D4 /* PathManagerConfig.h in Sources */ = {isa = PBXBuildFile; fileRef = 2663181720BD341700B637D4 /* PathManagerConfig.h */; };
 		407AC0F778F47A36A7542F1E /* Pods_BASE_POD_Draw.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 372E30D862649B95DB3F095C /* Pods_BASE_POD_Draw.framework */; };
 		739207EE1F7B82DA009A538C /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 739207ED1F7B82DA009A538C /* SettingViewController.m */; };
 		B98954191F6F606700C81BA9 /* UIkitBlockAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = B98954181F6F606700C81BA9 /* UIkitBlockAdditions.m */; };
@@ -42,6 +43,7 @@
 		264D612A20A463A7002D71A1 /* DHTouch.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DHTouch.m; sourceTree = "<group>"; };
 		2663181420BC641B00B637D4 /* PathManager+Utility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PathManager+Utility.h"; sourceTree = "<group>"; };
 		2663181520BC641B00B637D4 /* PathManager+Utility.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "PathManager+Utility.m"; sourceTree = "<group>"; };
+		2663181720BD341700B637D4 /* PathManagerConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PathManagerConfig.h; sourceTree = "<group>"; };
 		372E30D862649B95DB3F095C /* Pods_BASE_POD_Draw.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BASE_POD_Draw.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		739207EC1F7B82DA009A538C /* SettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingViewController.h; sourceTree = "<group>"; };
 		739207ED1F7B82DA009A538C /* SettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingViewController.m; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 				263A962620A0395C00B911F6 /* PathManager.m */,
 				2663181420BC641B00B637D4 /* PathManager+Utility.h */,
 				2663181520BC641B00B637D4 /* PathManager+Utility.m */,
+				2663181720BD341700B637D4 /* PathManagerConfig.h */,
 				264D612920A463A7002D71A1 /* DHTouch.h */,
 				264D612A20A463A7002D71A1 /* DHTouch.m */,
 				263A962B20A0A8BE00B911F6 /* DHPoint.h */,
@@ -349,6 +352,7 @@
 				B992D5CC1F99CEC8007AB5C2 /* IpenManager.m in Sources */,
 				B9A445611F66545F00C65EFC /* ZJWButton.m in Sources */,
 				B9A445621F66545F00C65EFC /* ZJWCoverView.m in Sources */,
+				2663181820BD341700B637D4 /* PathManagerConfig.h in Sources */,
 				B9A445601F66545F00C65EFC /* ZJWBezierPath.m in Sources */,
 				2663181620BC641B00B637D4 /* PathManager+Utility.m in Sources */,
 				B9A445641F66545F00C65EFC /* ZJWPhotoImg.m in Sources */,

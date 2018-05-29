@@ -7,11 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "PathManagerConfig.h"
+
 #import "ZJWBezierPath.h"
 #import "DHTouch.h"
 
-#define BlueToothDelay  0.3
-#define PATHMANAGER [PathManager sharedInstance]
+
 
 typedef void(^RegisterContentBlock)(NSString *content);
 

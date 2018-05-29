@@ -25,4 +25,14 @@
     return sqrtf((point1.x-point2.x)*(point1.x-point2.x)+(point1.y-point2.y)*(point1.y-point2.y));
 }
 
+- (BOOL)isPalmTouch:(DHTouch *)dhtouch {
+    CGFloat cent = dhtouch.touch.majorRadius/dhtouch.touch.majorRadiusTolerance;
+    if (cent<PalmRadius&&cent>PalmRadiusMin) {
+        return YES;
+    }
+    else {
+        return NO;
+    }
+}
+
 @end
