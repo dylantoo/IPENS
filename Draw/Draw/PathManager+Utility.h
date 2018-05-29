@@ -28,5 +28,9 @@
  */
 - (BOOL)isPalmTouch:(DHTouch *)dhtouch;
 
+/*
+ 判断新的touch是否已经存在队列中
+ */
+- (BOOL)isTouchExist:(UITouch *)touch;
 
 @end

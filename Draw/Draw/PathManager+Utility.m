@@ -35,4 +35,18 @@
     }
 }
 
+/*
+ 判断新的touch是否已经存在队列中
+ */
+- (BOOL)isTouchExist:(UITouch *)touch {
+    
+    DHTouch *existtouch = (DHTouch *)[self.holdTouches objectForKey:@(touch.hash)];
+    if (existtouch) {
+        return YES;
+    }
+    else {
+        return NO;
+    }
+}
+
 @end
