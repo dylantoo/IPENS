@@ -77,6 +77,10 @@
     
     NSLog(@"aaaaaaaaaaarray::::");
     
+//    if (self.path.isWriting&&self.curDHTouch) {
+//        return nil;
+//    }
+    
     
     int index = 0;
     

@@ -76,7 +76,7 @@ static PathManager *sharedObj = nil;
         NSLog(@"afterrrrrrcurrentTouchcurrentTouchcurrentTouch:%@",self.curDHTouch);
     }
     else {
-//        self.writingTimeStamp = 0.0;
+        self.writingTimeStamp = 0.0;
         //新增考虑，需要增加，不然会有飞线的可能
 //        self.curDHTouch = nil;
     }
@@ -149,7 +149,7 @@ static PathManager *sharedObj = nil;
     for (UITouch *touch in touches) {
         if (touch.phase==UITouchPhaseMoved) {
             NSLog(@"majorRadius move:%f %f",touch.majorRadius,touch.majorRadiusTolerance);///
-            NSLog(@"begin move:%@",touch);
+//            NSLog(@"begin move:%@",touch);
             DHTouch *existDTouch = (DHTouch *)[self.holdTouches objectForKey:@(touch.hash)];
             if (existDTouch) {
                 CGPoint point = [touch locationInView:touch.view];
@@ -209,7 +209,7 @@ static PathManager *sharedObj = nil;
  */
 - (void)addTouchObject:(UITouch *)touch {
 //    if (!self.isPenWriting&&[self mh_isNullOrNil:self.currentTouch]) {//
-    NSLog(@"addTouchObjectaddTouchObjectaddTouchObject:%f",touch.timestamp);
+    NSLog(@"addTouchObjectaddTouchObjectaddTouchObject:%f %lu",touch.timestamp,touch.hash);
     DHTouch *dhtouch = [[DHTouch alloc] init];
     dhtouch.touch = touch;
     dhtouch.beginTimStamp =  touch.timestamp;
@@ -219,14 +219,16 @@ static PathManager *sharedObj = nil;
     
     
     if (self.isPenWriting&&!self.curDHTouch) {
+        NSLog(@"当前没有curtouch，正在匹配");
         DHTouch *algoriTouch = [self currentTouchByAlgorithm];
         if (algoriTouch) {
+            NSLog(@"匹配成功curtouch");
             self.curDHTouch = algoriTouch;
         }
     }
     
     if (self.isPenWriting&&self.curDHTouch) {
-        
+        NSLog(@"当前已存在curtouch，正在优化");
         DHTouch *algoriTouch = [self currentTouchByAlgorithm];
         if (algoriTouch&&![self isCurrentTouch:algoriTouch.touch]) {
             
@@ -236,6 +238,7 @@ static PathManager *sharedObj = nil;
             CGPoint curpoint = [[self.curDHTouch.points firstObject] cgPoint];
             
             if (alpoint.x<curpoint.x) {
+                NSLog(@"优化成功，正在更新curtouch");
                 self.path.isWriting = NO;
                 self.path = nil;
                 [self.paths removeLastObject];
