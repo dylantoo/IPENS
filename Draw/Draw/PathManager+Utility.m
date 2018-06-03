@@ -49,4 +49,14 @@
     }
 }
 
+/*
+ 判断是否为当前识别penid
+ */
+- (BOOL)isCurrentTouch:(UITouch *)touch {
+    if (self.curDHTouch) {
+        return (self.curDHTouch.touch.hash == touch.hash);
+    }
+    return NO;
+}
+
 @end

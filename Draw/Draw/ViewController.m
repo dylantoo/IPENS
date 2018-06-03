@@ -21,9 +21,6 @@
 #import "IpenManager.h"
 #import "PathManager.h"
 
-#define screenW [UIScreen mainScreen].bounds.size.width
-#define screenH [UIScreen mainScreen].bounds.size.height
-#define WS(weakSelf)  __weak __typeof(&*self)weakSelf = self;
 #define ALERT(title,msg) [[[UIAlertView alloc] initWithTitle:title message:msg delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil] show]
 
 typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
@@ -44,6 +41,7 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
 @property (weak, nonatomic) IBOutlet UISlider *lineWidthSlider;
 
 @property (nonatomic, strong) UILabel *contentLbl;
+@property (nonatomic, strong) UILabel *majorLbl;
 
 @property (assign, nonatomic) BluetoothConnectOnTheScreenType bluetoothConnectOnTheScreenType;
 
@@ -136,6 +134,24 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
     
     PATHMANAGER.contentBlock = ^(NSString *content) {
         weakSelf.contentLbl.text = content;
+    };
+    
+    
+    self.majorLbl = [[UILabel alloc] init];
+    self.majorLbl.backgroundColor = [UIColor clearColor];
+    self.majorLbl.textColor = [UIColor blackColor];
+    self.majorLbl.font = [UIFont systemFontOfSize:14];
+    self.majorLbl.text = @"major信息:";
+    [self.view addSubview:self.majorLbl];
+    
+    [self.majorLbl mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.and.right.equalTo(weakSelf.view);
+        make.height.equalTo(@(30));
+        make.bottom.equalTo(weakSelf.contentLbl.mas_top);
+    }];
+    
+    PATHMANAGER.majorBlock = ^(NSString *content) {
+        weakSelf.majorLbl.text = content;
     };
 }
 

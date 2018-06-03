@@ -33,4 +33,9 @@
  */
 - (BOOL)isTouchExist:(UITouch *)touch;
 
+/*
+ 判断是否为当前识别penid
+ */
+- (BOOL)isCurrentTouch:(UITouch *)touch;
+
 @end

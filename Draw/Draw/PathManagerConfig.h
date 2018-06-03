@@ -18,11 +18,11 @@
 #define MinDistance     20
 
     //判定掌控的值
-#define PalmRadius      8.1
-#define PalmRadiusMin      4
+#define PalmRadius      10
+#define PalmRadiusMin      3.5
 
     //连续写时间距离间隔
-#define ContinueMaxDistance  50
+#define ContinueMaxDistance  150
 #define ContinueMaxTime      0.3
 
 
@@ -30,3 +30,6 @@
 #define MH_SCREEN_WIDTH  ([[UIScreen mainScreen] bounds].size.width)
 #define MH_SCREEN_HEIGHT ([[UIScreen mainScreen] bounds].size.height)
 #define WS(weakSelf)  __weak __typeof(&*self)weakSelf = self;
+
+#define screenW [UIScreen mainScreen].bounds.size.width
+#define screenH [UIScreen mainScreen].bounds.size.height

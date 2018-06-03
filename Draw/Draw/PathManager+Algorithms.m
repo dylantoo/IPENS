@@ -29,28 +29,33 @@
         CGFloat abs = fabs(dhtouch.beginTimStamp-self.writingTimeStamp);
         NSLog(@"only .....%f",abs);
         
-        
-        if ([self isPalmTouch:dhtouch]) {//(abs<BlueToothDelay)&&
-            
-            return dhtouch;
-            /*
-             ZJWBezierPath *lastPath = [self.paths lastObject];
-             CGPoint lastPoint = lastPath.currentPoint;
-             
-             if (fabs(lastPath.endTimeStamp-dhtouch.beginTimStamp)<ContinueMaxTime) {
-             NSLog(@"当前点与之前的点时间间隔太近了。。。。。");
-             if ([self distanceFrom:lastPoint toPoint:[dhtouch.points[0] cgPoint]]<ContinueMaxDistance) {
-             NSLog(@"当前点与之前的点在特定距离之内。。。。");
-             return dhtouch;
-             }
-             }
-             else {
-             //                NSLog(@"正常点位书写......");
-             return dhtouch;
-             }
-             */
-            
+        if (![self isPalmTouch:dhtouch]) {
+            return nil;
         }
+        
+        
+//        if ((abs<BlueToothDelay)) {//
+        
+            ZJWBezierPath *lastPath = [self.paths lastObject];
+            CGPoint lastPoint = lastPath.currentPoint;
+            
+            if (fabs(lastPath.endTimeStamp-dhtouch.beginTimStamp)<ContinueMaxTime) {
+                NSLog(@"当前点与之前的点时间间隔太近了。。。。。:%f  %f",lastPath.endTimeStamp,dhtouch.beginTimStamp);
+                if ([self distanceFrom:lastPoint toPoint:[[dhtouch.points lastObject] cgPoint]]<ContinueMaxDistance) {
+                    NSLog(@"当前点与之前的点在特定距离之内。。。。");
+                    return dhtouch;
+                }
+            }
+            else {
+                    //                NSLog(@"正常点位书写......");
+                return dhtouch;
+            }
+            
+            
+//        }
+//        else {
+//            return dhtouch;
+//        }
         NSLog(@"only return nil");
         return nil;
     }
@@ -81,25 +86,24 @@
         NSLog(@"%@ time:%f hash:%@",t.touch,t.beginTimStamp,@(t.hash));
         if ([self isPalmTouch:t]) {//(fabs(t.beginTimStamp-self.writingTimeStamp)<BlueToothDelay)&&
             
-            [realArray addObject:t];
+//            [realArray addObject:t];
             
-            /*
-             ZJWBezierPath *lastPath = [self.paths lastObject];
-             CGPoint lastPoint = lastPath.currentPoint;
-             
-             
-             if (fabs(lastPath.endTimeStamp-t.beginTimStamp)<ContinueMaxTime) {
-             NSLog(@"当前点与之前的点时间间隔太近了。。。。。");
-             if ([self distanceFrom:lastPoint toPoint:[t.points[0] cgPoint]]<ContinueMaxDistance) {
-             NSLog(@"当前点与之前的点在特定距离之内。。。。");
-             [realArray addObject:t];
-             }
-             }
-             else {
-             NSLog(@"正常点位书写......");
-             [realArray addObject:t];
-             }
-             */
+            ZJWBezierPath *lastPath = [self.paths lastObject];
+            CGPoint lastPoint = lastPath.currentPoint;
+            
+            
+            if (fabs(lastPath.endTimeStamp-t.beginTimStamp)<ContinueMaxTime) {
+                NSLog(@"当前点与之前的点时间间隔太近了。。。。。");
+                if ([self distanceFrom:lastPoint toPoint:[[t.points lastObject] cgPoint]]<ContinueMaxDistance) {
+                    NSLog(@"当前点与之前的点在特定距离之内。。。。");
+                    [realArray addObject:t];
+                }
+            }
+            else {
+                NSLog(@"正常点位书写......");
+                [realArray addObject:t];
+            }
+            
         }
     }
     
@@ -113,7 +117,7 @@
         DHTouch *dtouch2 = (DHTouch *)realArray[i];
         NSTimeInterval first = dtouch1.beginTimStamp;
         NSTimeInterval second = dtouch2.beginTimStamp;
-        NSLog(@"touch time:%f,%f",first,second);
+        NSLog(@"touch time:%f,%f writing:%f",first,second,self.writingTimeStamp);
         if (fabs(first-self.writingTimeStamp) < fabs(second-self.writingTimeStamp)) {
             
         }

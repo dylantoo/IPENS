@@ -118,7 +118,7 @@
 #pragma mark - Touch Events
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-//    NSLog(@"touchesBegan.........:%@",event);
+    NSLog(@"touchesBegan.........:%@",event);
 
     NSSet *allTouches = [event allTouches];
     NSArray *arr = [allTouches allObjects];
@@ -154,7 +154,7 @@
     NSLog(@"==========>>>>>>>>>>>>>>>>>>>>>>>Cancelled:%@",event);
     NSSet *allTouches = [event allTouches];
     NSArray *arr = [allTouches allObjects];
-    [PATHMANAGER touchesEnded:arr];
+    [PATHMANAGER touchesCancel:arr];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self setNeedsDisplay];
     });

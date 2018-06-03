@@ -15,6 +15,7 @@
 
 
 typedef void(^RegisterContentBlock)(NSString *content);
+typedef void(^MajorContentBlock)(NSString *content);
 
 @interface PathManager : NSObject
 
@@ -59,6 +60,7 @@ typedef void(^RegisterContentBlock)(NSString *content);
  反馈消息block
  */
 @property (nonatomic, copy) RegisterContentBlock contentBlock;
+@property (nonatomic, copy) MajorContentBlock majorBlock;
 
 + (PathManager *)sharedInstance;
 

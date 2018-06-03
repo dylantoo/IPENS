@@ -55,14 +55,17 @@ static PathManager *sharedObj = nil;
         return;
     }
     
+    //有笔迹的时候，不做中断处理
+    if (self.curDHTouch) {
+        return;
+    }
+    
     _isPenWriting = isPenWriting;
     
     
     NSLog(@"pen is writing....:%d",isPenWriting);
     if (_isPenWriting) {
-        NSProcessInfo *info = [NSProcessInfo processInfo];
-        NSTimeInterval now = info.systemUptime;
-        self.writingTimeStamp = now;
+        
         NSLog(@"pen writing time:%f",self.writingTimeStamp);
         NSLog(@"currentTouchcurrentTouchcurrentTouch:%@",self.curDHTouch);
         DHTouch *algoriTouch = [self currentTouchByAlgorithm];
@@ -73,15 +76,16 @@ static PathManager *sharedObj = nil;
         NSLog(@"afterrrrrrcurrentTouchcurrentTouchcurrentTouch:%@",self.curDHTouch);
     }
     else {
-        self.writingTimeStamp = 0.0;
+//        self.writingTimeStamp = 0.0;
         //新增考虑，需要增加，不然会有飞线的可能
-        self.curDHTouch = nil;
+//        self.curDHTouch = nil;
     }
 }
 
 - (void)setCurDHTouch:(DHTouch *)curDHTouch {
     _curDHTouch = curDHTouch;
     if (curDHTouch) {
+        self.writingTimeStamp = [self nowTimeStamp];
         NSLog(@"zzzzzzzzzzzzzzzzzzzzzzz;%@",self.path);
         if (!self.path) {
             NSLog(@"createcatet path");
@@ -92,7 +96,7 @@ static PathManager *sharedObj = nil;
             path.lineCapStyle = kCGLineCapRound;
             path.lineJoinStyle = kCGLineJoinRound;
             path.pathColor = [UIColor blueColor];
-            path.lineWidth = 4;
+            path.lineWidth = 3;
             self.path = path;
             [self.paths addObject:self.path];
             
@@ -103,6 +107,8 @@ static PathManager *sharedObj = nil;
         }
     }
     else {
+        
+        self.writingTimeStamp = 0.0;
         self.path = nil;
         [self.holdTouches removeAllObjects];
         self.isPenWriting = NO;
@@ -121,7 +127,10 @@ static PathManager *sharedObj = nil;
     for (UITouch *touch in touches) {
         if ((touch.phase == UITouchPhaseBegan)) {//&&![self isTouchExist:touch]
             NSLog(@"touchsBegin事件时间戳:%f", touch.timestamp);
-            NSLog(@"majorRadius begin:%f %f",touch.majorRadius,touch.majorRadiusTolerance);///
+            NSString *str = [NSString stringWithFormat:@"major信息:%f %f",touch.majorRadius,touch.majorRadiusTolerance];
+            NSLog(@"%@", str);///
+            
+            self.majorBlock(str);
             NSLog(@"begin touch:%@",touch);
             [self addTouchObject:touch];
         }
@@ -131,9 +140,9 @@ static PathManager *sharedObj = nil;
 }
 
 - (void)touchesMove:(NSArray *)touches {
-    if (!self.isConnectedBlueTooth) {
-        return;
-    }
+//    if (!self.isConnectedBlueTooth) {
+//        return;
+//    }
     
     for (UITouch *touch in touches) {
         if (touch.phase==UITouchPhaseMoved) {
@@ -146,8 +155,8 @@ static PathManager *sharedObj = nil;
             }
         }
         
-        if (self.curDHTouch) {
-            CGPoint curPoint = [[self.curDHTouch.points lastObject] cgPoint];
+        if ([self isCurrentTouch:touch]) {
+            CGPoint curPoint = [touch locationInView:touch.view];
             NSString *blockStr = [NSString stringWithFormat:@"书写信息:当前点位{%f,%f}",curPoint.x,curPoint.y];
             self.contentBlock(blockStr);
             [self addLineToPoint:curPoint];
@@ -181,9 +190,7 @@ static PathManager *sharedObj = nil;
             return;
         }
         
-        NSProcessInfo *info = [NSProcessInfo processInfo];
-        NSTimeInterval now = info.systemUptime;
-        self.path.endTimeStamp = now;
+        self.path.endTimeStamp = [self nowTimeStamp] ;
         self.path.endPoint = point;
         [self.path addLineToPoint:point];
         
@@ -217,8 +224,9 @@ static PathManager *sharedObj = nil;
     }
     
     if (self.isPenWriting&&self.curDHTouch) {
+        
         DHTouch *algoriTouch = [self currentTouchByAlgorithm];
-        if (algoriTouch&&(dhtouch.touch.hash !=self.curDHTouch.touch.hash)) {
+        if (algoriTouch&&![self isCurrentTouch:algoriTouch.touch]) {
             
             //时长内多个点取左侧点
             
@@ -236,9 +244,11 @@ static PathManager *sharedObj = nil;
 }
 
 - (void)removeTouchObject:(UITouch *)touch {
+    NSLog(@"正在移除某个touch:%f %lu",touch.timestamp,(unsigned long)touch.hash);
     DHTouch *dhtouch = self.holdTouches[@(touch.hash)];
     if (self.curDHTouch) {
         if (dhtouch.touch.hash ==self.curDHTouch.touch.hash) {
+            NSLog(@"removeTouchObject当前的Touch");
             self.curDHTouch = nil;
         }
     }
