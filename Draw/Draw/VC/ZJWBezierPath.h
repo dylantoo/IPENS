@@ -18,4 +18,7 @@
 //结束时点位
 @property (nonatomic) CGPoint endPoint;
 
+//是否正在书写
+@property (nonatomic) BOOL isWriting;
+
 @end

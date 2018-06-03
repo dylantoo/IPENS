@@ -98,6 +98,7 @@ static PathManager *sharedObj = nil;
             path.pathColor = [UIColor blueColor];
             path.lineWidth = 3;
             self.path = path;
+            self.path.isWriting = YES;
             [self.paths addObject:self.path];
             
             
@@ -109,6 +110,7 @@ static PathManager *sharedObj = nil;
     else {
         
         self.writingTimeStamp = 0.0;
+        self.path.isWriting = NO;
         self.path = nil;
         [self.holdTouches removeAllObjects];
         self.isPenWriting = NO;
@@ -157,7 +159,7 @@ static PathManager *sharedObj = nil;
         
         if ([self isCurrentTouch:touch]) {
             CGPoint curPoint = [touch locationInView:touch.view];
-            NSString *blockStr = [NSString stringWithFormat:@"书写信息:当前点位{%f,%f}",curPoint.x,curPoint.y];
+            NSString *blockStr = [NSString stringWithFormat:@"书写信息:当前点位{%f,%f} 当前penid:%lu",curPoint.x,curPoint.y,self.curDHTouch.touch.hash];
             self.contentBlock(blockStr);
             [self addLineToPoint:curPoint];
         }
@@ -234,6 +236,7 @@ static PathManager *sharedObj = nil;
             CGPoint curpoint = [[self.curDHTouch.points firstObject] cgPoint];
             
             if (alpoint.x<curpoint.x) {
+                self.path.isWriting = NO;
                 self.path = nil;
                 [self.paths removeLastObject];
                 self.curDHTouch = algoriTouch;
