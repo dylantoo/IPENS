@@ -151,6 +151,13 @@ typedef NS_ENUM(NSInteger, BluetoothConnectOnTheScreenType) {
     }];
     
     PATHMANAGER.majorBlock = ^(NSString *content) {
+        if ([content isEqualToString:RemoveCurTouchTip]) {
+            self.majorLbl.backgroundColor = [UIColor redColor];
+        }
+        else {
+            self.majorLbl.backgroundColor = [UIColor clearColor];
+        }
+        
         weakSelf.majorLbl.text = content;
     };
 }

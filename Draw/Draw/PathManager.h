@@ -25,12 +25,12 @@ typedef void(^MajorContentBlock)(NSString *content);
 @property (nonatomic) BOOL isConnectedBlueTooth;
 
 /*
- 接收到笔触信号 , 蓝牙笔是否在写
+ 接收到笔触信号 , 蓝牙笔是否按压在屏幕上
  */
 @property (nonatomic) BOOL isPenWriting;
 
 /*
- 蓝牙上报时的timestamp，用于比较晚到的touch
+ 蓝牙上报时的timestamp，用于比较晚到的touch,
  */
 @property (nonatomic) NSTimeInterval writingTimeStamp;
 
@@ -63,7 +63,6 @@ typedef void(^MajorContentBlock)(NSString *content);
 @property (nonatomic, copy) MajorContentBlock majorBlock;
 
 + (PathManager *)sharedInstance;
-
 
 - (void)touchesBegin:(NSArray *)touches;
 - (void)touchesMove:(NSArray *)touches;

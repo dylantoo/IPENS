@@ -33,3 +33,6 @@
 
 #define screenW [UIScreen mainScreen].bounds.size.width
 #define screenH [UIScreen mainScreen].bounds.size.height
+
+
+#define RemoveCurTouchTip @"正在移除当前的touch"

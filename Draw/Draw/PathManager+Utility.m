@@ -22,7 +22,9 @@
 }
 
 - (CGFloat)distanceFrom:(CGPoint)point1 toPoint:(CGPoint)point2 {
-    return sqrtf((point1.x-point2.x)*(point1.x-point2.x)+(point1.y-point2.y)*(point1.y-point2.y));
+    CGFloat distance = sqrtf((point1.x-point2.x)*(point1.x-point2.x)+(point1.y-point2.y)*(point1.y-point2.y));
+    NSLog(@"两点间距离:%f",distance);
+    return distance;
 }
 
 - (BOOL)isPalmTouch:(DHTouch *)dhtouch {

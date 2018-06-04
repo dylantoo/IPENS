@@ -16,15 +16,6 @@
 - (DHTouch *)currentTouchByAlgorithm;
 
 
-/**
- 根据蓝牙笔触上报时间距离最近的为 currentTouch
- */
-- (DHTouch *)currentTouchFromLeastInterval;
 
-
-/*
- 滤波平滑算法点位转化
- */
-- (CGPoint)LMSalgorithm:(CGPoint)point;
 
 @end

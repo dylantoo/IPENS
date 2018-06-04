@@ -19,86 +19,34 @@
         NSLog(@"还没有touch预存！！！！");
         return nil;
     }
-    else if (self.holdTouches.allValues.count==1) {
-        NSLog(@"Only one touch!!!!!!!!");
-        
-            //TODO: 是否还需要加入其它判断
-        
-        DHTouch *dhtouch = ((DHTouch*)self.holdTouches.allValues[0]);
-        
-        CGFloat abs = fabs(dhtouch.beginTimStamp-self.writingTimeStamp);
-        NSLog(@"only .....%f",abs);
-        
-        if (![self isPalmTouch:dhtouch]) {
-            return nil;
-        }
-        
-        
-//        if ((abs<BlueToothDelay)) {//
-        
-            ZJWBezierPath *lastPath = [self.paths lastObject];
-            CGPoint lastPoint = lastPath.currentPoint;
-            
-            if (fabs(lastPath.endTimeStamp-dhtouch.beginTimStamp)<ContinueMaxTime) {
-                NSLog(@"当前点与之前的点时间间隔太近了。。。。。:%f  %f",lastPath.endTimeStamp,dhtouch.beginTimStamp);
-                if ([self distanceFrom:lastPoint toPoint:[[dhtouch.points lastObject] cgPoint]]<ContinueMaxDistance) {
-                    NSLog(@"当前点与之前的点在特定距离之内。。。。");
-                    return dhtouch;
-                }
-            }
-            else {
-                    //                NSLog(@"正常点位书写......");
-                return dhtouch;
-            }
-            
-            
-//        }
-//        else {
-//            return dhtouch;
-//        }
-        NSLog(@"only return nil");
-        return nil;
-    }
-    else if(self.holdTouches.allValues.count>1) {
-            //有多点
-        DHTouch *leastTouch = [self currentTouchFromLeastInterval];
-        if (leastTouch) {
-            return leastTouch;
-        }
-    }
-    return nil;
-}
-
-
-/**
- 根据蓝牙笔触上报时间距离最近的为 currentTouch
- */
-- (DHTouch *)currentTouchFromLeastInterval {
     
-    NSLog(@"aaaaaaaaaaarray::::");
-    
-//    if (self.path.isWriting&&self.curDHTouch) {
-//        return nil;
-//    }
-    
-    
-    int index = 0;
     
         //进行第一批筛选去掉时间区域外和掌控明显的
     NSMutableArray *realArray = [NSMutableArray array];
     for (DHTouch *t in self.holdTouches.allValues) {
         NSLog(@"%@ time:%f hash:%@",t.touch,t.beginTimStamp,@(t.hash));
-        if ([self isPalmTouch:t]) {//(fabs(t.beginTimStamp-self.writingTimeStamp)<BlueToothDelay)&&
+        if ((fabs(t.beginTimStamp-self.writingTimeStamp)<BlueToothDelay)&&self.writingTimeStamp>0&&[self isPalmTouch:t]) {
+            NSLog(@"初步条件筛选成功");
+            if (self.paths.count == 0) {
+                [realArray addObject:t];
+                break;
+            }
             
-//            [realArray addObject:t];
+            if (self.holdTouches.count==1) {
+                [realArray addObject:t];
+                break;
+            }
             
             ZJWBezierPath *lastPath = [self.paths lastObject];
             CGPoint lastPoint = lastPath.currentPoint;
+            CGFloat fabsinteval = fabs(lastPath.endTimeStamp-t.beginTimStamp);
+            NSLog(@"两笔之间间隔的时间：%f",fabsinteval);
             
             
-            if (fabs(lastPath.endTimeStamp-t.beginTimStamp)<ContinueMaxTime) {
+            
+            if (fabsinteval<ContinueMaxTime) {
                 NSLog(@"当前点与之前的点时间间隔太近了。。。。。");
-                if ([self distanceFrom:lastPoint toPoint:[[t.points lastObject] cgPoint]]<ContinueMaxDistance) {
+                if ([self distanceFrom:lastPoint toPoint:[[t.points firstObject] cgPoint]]<ContinueMaxDistance) {
                     NSLog(@"当前点与之前的点在特定距离之内。。。。");
                     [realArray addObject:t];
                 }
@@ -115,6 +63,9 @@
         return nil;
     }
     
+    NSLog(@"初步筛选符合条件的点位还剩下:%d",realArray.count);
+    
+    int index = 0;
     for (int i = index+1; i<realArray.count; i++) {
             //时间戳最接近蓝牙笔触上报时间点
         DHTouch *dtouch1 = (DHTouch *)realArray[index];
@@ -127,6 +78,7 @@
         }
         else if (fabs(first-self.writingTimeStamp) == fabs(second-self.writingTimeStamp)) {
                 //如果时间相同 左撇子靠左的点
+            NSLog(@"时间相同 左撇子靠左的点");
             CGFloat x1 = [dtouch1.points[0] cgPoint].x;
             CGFloat x2 = [dtouch2.points[0] cgPoint].x;
             if (x1<x2) {
@@ -145,8 +97,11 @@
     return ((DHTouch *)realArray[index]);
 }
 
-- (CGPoint)LMSalgorithm:(CGPoint)point {
-    return CGPointZero;
-}
+
+/**
+ 根据蓝牙笔触上报时间距离最近的为 currentTouch
+ */
+
+
 
 @end

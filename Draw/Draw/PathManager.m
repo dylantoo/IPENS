@@ -57,6 +57,7 @@ static PathManager *sharedObj = nil;
     
     //有笔迹的时候，不做中断处理
     if (self.curDHTouch) {
+        NSLog(@"当前已经存在touch:%lu",(unsigned long)self.curDHTouch.touch.hash);
         return;
     }
     
@@ -65,7 +66,7 @@ static PathManager *sharedObj = nil;
     
     NSLog(@"pen is writing....:%d",isPenWriting);
     if (_isPenWriting) {
-        
+        self.writingTimeStamp = [self nowTimeStamp];
         NSLog(@"pen writing time:%f",self.writingTimeStamp);
         NSLog(@"currentTouchcurrentTouchcurrentTouch:%@",self.curDHTouch);
         DHTouch *algoriTouch = [self currentTouchByAlgorithm];
@@ -108,11 +109,11 @@ static PathManager *sharedObj = nil;
         }
     }
     else {
-        
         self.writingTimeStamp = 0.0;
         self.path.isWriting = NO;
         self.path = nil;
         [self.holdTouches removeAllObjects];
+        NSLog(@"正在清空Curtouch,holdtouch还剩余:%lu",(unsigned long)self.holdTouches.count);
         self.isPenWriting = NO;
     }
 }
@@ -148,7 +149,7 @@ static PathManager *sharedObj = nil;
     
     for (UITouch *touch in touches) {
         if (touch.phase==UITouchPhaseMoved) {
-            NSLog(@"majorRadius move:%f %f",touch.majorRadius,touch.majorRadiusTolerance);///
+//            NSLog(@"majorRadius move:%f %f",touch.majorRadius,touch.majorRadiusTolerance);///
 //            NSLog(@"begin move:%@",touch);
             DHTouch *existDTouch = (DHTouch *)[self.holdTouches objectForKey:@(touch.hash)];
             if (existDTouch) {
@@ -159,7 +160,7 @@ static PathManager *sharedObj = nil;
         
         if ([self isCurrentTouch:touch]) {
             CGPoint curPoint = [touch locationInView:touch.view];
-            NSString *blockStr = [NSString stringWithFormat:@"书写信息:当前点位{%f,%f} 当前penid:%lu",curPoint.x,curPoint.y,self.curDHTouch.touch.hash];
+            NSString *blockStr = [NSString stringWithFormat:@"书写信息:当前点位{%f,%f} 当前penid:%lu",curPoint.x,curPoint.y,(unsigned long)self.curDHTouch.touch.hash];
             self.contentBlock(blockStr);
             [self addLineToPoint:curPoint];
         }
@@ -209,7 +210,7 @@ static PathManager *sharedObj = nil;
  */
 - (void)addTouchObject:(UITouch *)touch {
 //    if (!self.isPenWriting&&[self mh_isNullOrNil:self.currentTouch]) {//
-    NSLog(@"addTouchObjectaddTouchObjectaddTouchObject:%f %lu",touch.timestamp,touch.hash);
+    NSLog(@"addTouchObjectaddTouchObjectaddTouchObject:%f %lu",touch.timestamp,(unsigned long)touch.hash);
     DHTouch *dhtouch = [[DHTouch alloc] init];
     dhtouch.touch = touch;
     dhtouch.beginTimStamp =  touch.timestamp;
@@ -224,26 +225,20 @@ static PathManager *sharedObj = nil;
         if (algoriTouch) {
             NSLog(@"匹配成功curtouch");
             self.curDHTouch = algoriTouch;
+            return;
         }
     }
+    
     
     if (self.isPenWriting&&self.curDHTouch) {
         NSLog(@"当前已存在curtouch，正在优化");
         DHTouch *algoriTouch = [self currentTouchByAlgorithm];
         if (algoriTouch&&![self isCurrentTouch:algoriTouch.touch]) {
-            
-            //时长内多个点取左侧点
-            
-            CGPoint alpoint = [[algoriTouch.points firstObject] cgPoint];
-            CGPoint curpoint = [[self.curDHTouch.points firstObject] cgPoint];
-            
-            if (alpoint.x<curpoint.x) {
-                NSLog(@"优化成功，正在更新curtouch");
-                self.path.isWriting = NO;
-                self.path = nil;
-                [self.paths removeLastObject];
-                self.curDHTouch = algoriTouch;
-            }
+            NSLog(@"优化成功，正在更新curtouch");
+            self.path.isWriting = NO;
+            self.path = nil;
+            [self.paths removeLastObject];
+            self.curDHTouch = algoriTouch;
         }
     }
 
@@ -253,8 +248,9 @@ static PathManager *sharedObj = nil;
     NSLog(@"正在移除某个touch:%f %lu",touch.timestamp,(unsigned long)touch.hash);
     DHTouch *dhtouch = self.holdTouches[@(touch.hash)];
     if (self.curDHTouch) {
-        if (dhtouch.touch.hash ==self.curDHTouch.touch.hash) {
+        if (touch.hash ==self.curDHTouch.touch.hash) {
             NSLog(@"removeTouchObject当前的Touch");
+            self.majorBlock(RemoveCurTouchTip);
             self.curDHTouch = nil;
         }
     }
